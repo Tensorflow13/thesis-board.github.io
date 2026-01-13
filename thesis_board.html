@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometry-Aware Explainable Fraud Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8fafc; /* Slate 50 - Light */
+            color: #1e293b; /* Slate 800 - Dark Text */
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .section-card {
+            background-color: #ffffff; /* White */
+            border-left: 4px solid #64748b; /* Slate 500 */
+            transition: transform 0.2s, border-left-color 0.2s;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .section-card:hover {
+            border-left-color: #0ea5e9; /* Sky 500 */
+            transform: translateX(4px);
+        }
+
+        /* Iceberg Animation */
+        .water-surface {
+            animation: wave 3s infinite linear;
+        }
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50px); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden selection:bg-sky-200 selection:text-sky-900">
+    
+    <!-- SVG Definitions for Arrowheads -->
+    <svg style="display: none;">
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9" />
+            </marker>
+            <marker id="arrow-grey" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
+            </marker>
+        </defs>
+    </svg>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-opacity-90">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-wide">Geometry-Aware Explainable Fraud Detection</h1>
+                <p class="text-slate-600 text-sm md:text-base mt-1 italic">When Performance Gains Mask Representational Collapse</p>
+                <p class="text-slate-400 text-xs mt-1 uppercase tracking-wider font-medium">An Empirical and Theoretical Study of Latent Geometry Under Extreme Class Imbalance</p>
+            </div>
+            <div class="mt-4 md:mt-0 text-right hidden md:block">
+                <p class="text-xs text-slate-500 uppercase tracking-widest">Conference Research Board</p>
+                <p class="text-xs text-sky-600 font-mono">ID: 216011757</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- Slide 1: Context & Motivation -->
+        <section class="section-card rounded-lg p-6 md:p-8">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <!-- Text Content -->
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 border-b border-slate-200 pb-2">1. Context: The Imbalance Challenge</h3>
+                    
+                    <!-- The Layman's Intuition Block (UPDATED) -->
+                    <div class="mb-6 bg-indigo-50 p-4 rounded-lg border border-indigo-100 shadow-sm">
+                        <h4 class="font-bold text-indigo-900 text-sm flex items-center gap-2 mb-2">
+                            <i class="fas fa-lightbulb text-indigo-500"></i> The Core Intuition: "Catch vs. Convict"
+                        </h4>
+                        <p class="text-xs text-indigo-800 leading-relaxed mb-2">
+                            Imagine a city with <strong>499 law-abiding citizens</strong> and <strong>1 criminal</strong>. Standard AI ignores the criminal to score 99.8% accuracy.
+                        </p>
+                        <p class="text-xs text-indigo-800 leading-relaxed">
+                            The SOTA fix gives the criminal a <strong>500x Signal Amplifier</strong>. The model <em>must</em> identify them. <br>
+                            <span class="font-bold text-red-600">The cost?</span> The amplification creates distortion ("clipping"). Every criminal looks like a generic loud noise. <strong>We catch them, but we destroy the forensic evidence needed for conviction in court.</strong>
+                        </p>
+                        <p class="text-[10px] text-indigo-400 mt-2 italic border-t border-indigo-200 pt-1">
+                            * While simplified, this analogy captures the trade-off between detection recall and geometric fidelity.
+                        </p>
+                    </div>
+
+                    <div class="space-y-4 text-slate-700 border-t border-slate-100 pt-4">
+                        <div class="bg-slate-50 p-3 rounded border-l-4 border-slate-400">
+                            <h4 class="font-bold text-slate-800 text-sm">The Reality</h4>
+                            <p class="text-sm mt-1 leading-relaxed">Credit card fraud is inherently rare (e.g., <span class="font-mono text-slate-900 font-bold">0.17%</span>). Standard models ignore these events, creating a blindspot.</p>
+                        </div>
+                        
+                        <div class="bg-sky-50 p-3 rounded border-l-4 border-sky-400">
+                            <h4 class="font-bold text-sky-900 text-sm">The SOTA Approach (Shi et al.)</h4>
+                            <p class="text-sm mt-1 leading-relaxed"><strong>Balanced VAE</strong> utilizes ratio-weighted objectives to explicitly prioritize minority samples, successfully boosting recall.</p>
+                        </div>
+
+                        <div class="bg-red-50 p-3 rounded border-l-4 border-red-400">
+                            <h4 class="font-bold text-red-900 text-sm">The Hidden Cost</h4>
+                            <p class="text-sm mt-1 text-red-800 leading-relaxed">Aggressive weighting forces minority representations to <strong class="text-red-900">collapse geometrically</strong>. While detection improves, the internal structure required for faithful explanations is destroyed.</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Visual: Imbalance Scale -->
+                <div class="relative h-64 bg-slate-50 rounded-lg border border-slate-200 flex flex-col items-center justify-center p-4">
+                     <svg viewBox="0 0 300 150" class="w-full h-full">
+                        <!-- Imbalance Side -->
+                        <circle cx="60" cy="75" r="45" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" />
+                        <text x="60" y="80" text-anchor="middle" font-size="10" fill="#64748b">Citizens (99.8%)</text>
+                        <!-- Fraud Dot -->
+                        <circle cx="110" cy="75" r="4" fill="#ef4444" />
+                        <text x="110" y="60" text-anchor="middle" font-size="10" fill="#ef4444" font-weight="bold">Criminal (0.2%)</text>
+                        
+                        <!-- Processing Arrow -->
+                        <line x1="130" y1="75" x2="180" y2="75" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-grey)" />
+                        <text x="155" y="65" text-anchor="middle" font-size="9" fill="#0ea5e9" font-weight="bold">"Amplification"</text>
+                        <text x="155" y="85" text-anchor="middle" font-size="8" fill="#64748b">Weight x500</text>
+        
+                        <!-- Result Side -->
+                        <rect x="200" y="40" width="80" height="70" rx="4" fill="#fff" stroke="#94a3b8" stroke-dasharray="2,2" />
+                        <text x="240" y="55" text-anchor="middle" font-size="8" fill="#64748b" font-weight="bold">Evidence</text>
+                        <!-- Collapsed Point -->
+                        <circle cx="240" cy="85" r="2" fill="#ef4444" />
+                        <circle cx="240" cy="85" r="6" fill="none" stroke="#ef4444" stroke-opacity="0.3" class="animate-ping" />
+                        
+                         <text x="240" y="100" text-anchor="middle" font-size="8" fill="#ef4444" font-weight="bold">Distorted / Generic</text>
+                         <text x="240" y="125" text-anchor="middle" font-size="7" fill="#0f172a">"Details Lost"</text>
+                     </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: The Courtroom Reality (NEW) -->
+        <section class="section-card rounded-lg p-6 md:p-8">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">2. The "Courtroom" Reality</h3>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- The Problem -->
+                <div class="space-y-4">
+                    <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
+                        <h4 class="font-bold text-orange-900 text-sm flex items-center gap-2">
+                            <i class="fas fa-gavel"></i> The High AUPRC Trap
+                        </h4>
+                        <p class="text-sm mt-2 text-orange-800 leading-relaxed">
+                            A model with 99% Recall (AUPRC) catches the fraudster. But in court or regulatory audits, detection is not enough. You need <strong>admissible evidence</strong> (specific reasons).
+                        </p>
+                    </div>
+                    
+                    <div class="p-4 bg-slate-50 rounded border border-slate-200 shadow-sm">
+                        <h5 class="text-xs font-bold text-slate-500 uppercase mb-2">Scenario: Defending a Blocked Transaction</h5>
+                        <p class="text-sm text-slate-700 italic mb-2">"Why did you block this card, Mr. Banker?"</p>
+                        
+                        <div class="mt-3 space-y-3">
+                            <div class="flex gap-3 items-start opacity-70">
+                                <div class="w-6 h-6 rounded-full bg-red-100 text-red-500 flex items-center justify-center shrink-0"><i class="fas fa-times"></i></div>
+                                <div>
+                                    <strong class="text-xs text-red-600 block">Collapsed Model (Shi et al.)</strong>
+                                    <p class="text-xs text-slate-500">"The fraud score was 0.99. It matched the generic fraud cluster."</p>
+                                    <span class="text-[10px] bg-red-100 text-red-600 px-1 rounded font-bold">Result: Case Lost (Black Box)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 items-start">
+                                <div class="w-6 h-6 rounded-full bg-green-100 text-green-500 flex items-center justify-center shrink-0"><i class="fas fa-check"></i></div>
+                                <div>
+                                    <strong class="text-xs text-green-600 block">Geometry-Aware Model (Ours)</strong>
+                                    <p class="text-xs text-slate-700">"The latent geometry shows a distinct anomaly in <strong>Geolocation</strong> vs <strong>Velocity</strong>, matching a known syndicate pattern."</p>
+                                    <span class="text-[10px] bg-green-100 text-green-600 px-1 rounded font-bold">Result: Evidence Suffice</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The Trade Off Matrix -->
+                <div class="space-y-4">
+                     <h4 class="text-sm font-bold text-slate-500 uppercase tracking-wider">The Technical Trade-off</h4>
+                     <p class="text-xs text-slate-600 mb-3">We need AUPRC to find them, but Geometry to convict them.</p>
+                     <div class="overflow-hidden rounded-lg border border-slate-200">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-2">Approach</th>
+                                    <th class="px-4 py-2">Detection (AUPRC)</th>
+                                    <th class="px-4 py-2">Forensic Quality (XAI)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr>
+                                    <td class="px-4 py-3 font-medium text-slate-600">Standard VAE</td>
+                                    <td class="px-4 py-3 text-red-500">Misses Criminal</td>
+                                    <td class="px-4 py-3 text-slate-400">N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-medium text-slate-600">Balanced VAE</td>
+                                    <td class="px-4 py-3 text-green-600 font-bold">Catches Criminal</td>
+                                    <td class="px-4 py-3 text-red-500 font-bold">Inadmissible<br><span class="text-[10px] font-normal text-slate-500">(Generic "High Risk")</span></td>
+                                </tr>
+                                <tr class="bg-indigo-50">
+                                    <td class="px-4 py-3 font-medium text-indigo-900">Mahalanobis (Ours)</td>
+                                    <td class="px-4 py-3 text-green-600 font-bold">Catches Criminal</td>
+                                    <td class="px-4 py-3 text-green-600 font-bold">Admissible<br><span class="text-[10px] font-normal text-indigo-700">(Specific Features)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: The Technical Consequence -->
+        <section class="section-card rounded-lg p-6 md:p-8">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 border-b border-slate-200 pb-2">3. The Technical Consequence</h3>
+                    <ul class="space-y-4 text-slate-700">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-eye text-sky-500 mt-1"></i>
+                            <div>
+                                <strong class="text-slate-900">Above Water (Visible):</strong> High AUPRC (0.85), stable SHAP explanations, regulatory-compliant reports.
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-water text-red-500 mt-1"></i>
+                            <div>
+                                <strong class="text-slate-900">Below Water (Invisible):</strong> Latent manifold collapsed to rank 1. Explanations are unfaithful. Attention weights degenerate.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Visual Hook: Iceberg SVG -->
+                <div class="relative h-64 bg-gradient-to-b from-sky-50 to-white rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center shadow-inner">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <!-- Sky -->
+                        <rect x="0" y="0" width="200" height="100" fill="none" />
+                        <!-- Water Line -->
+                        <path d="M0,100 Q50,95 100,100 T200,100" fill="none" stroke="#0ea5e9" stroke-width="2" class="water-surface"/>
+                        
+                        <!-- Labels -->
+                        <text x="150" y="30" text-anchor="middle" fill="#64748b" font-size="8" font-weight="bold">Standard Eval Captures</text>
+                        <text x="150" y="180" text-anchor="middle" fill="#ef4444" font-size="8" font-weight="bold">Standard Eval Misses</text>
+
+                        <!-- Iceberg Above -->
+                        <path d="M100,100 L80,60 L100,30 L130,50 L120,100 Z" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>
+                        <text x="135" y="55" fill="#334155" font-size="8" font-family="sans-serif">High AUPRC</text>
+                        
+                        <!-- Iceberg Below (Collapsed/Massive) -->
+                        <path d="M80,100 L60,160 L100,190 L150,150 L120,100 Z" fill="#94a3b8" opacity="0.5"/>
+                        <text x="30" y="160" fill="#ef4444" font-size="8" font-family="sans-serif">Collapsed Rank 1</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Theoretical Mechanism -->
+        <section class="section-card rounded-lg p-6 md:p-8">
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="order-2 md:order-1">
+                    <!-- Visual Hook: Exploding Gradient (Simulated) -->
+                    <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 h-full flex flex-col">
+                        <h4 class="text-xs font-mono text-slate-500 mb-2 text-center uppercase tracking-wider">Gradient Variance Dynamics</h4>
+                        <div class="flex-grow relative min-h-[200px]">
+                            <canvas id="gradientChart"></canvas>
+                        </div>
+                        <p class="text-[10px] text-center mt-2 text-slate-400">Fig 1: Minority variance ($\sigma^2$) exploding under Ratio-Weighted KL vs. Bounded Mahalanobis</p>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 border-b border-slate-200 pb-2">4. The Theoretical Mechanism</h3>
+                    <div class="space-y-4 text-slate-700">
+                        <div class="bg-white p-4 rounded border-l-2 border-purple-500 shadow-sm">
+                            <p class="font-serif italic text-lg text-slate-800 mb-2">Gradient Variance Amplification</p>
+                            <p class="text-xs text-slate-500 uppercase tracking-wide mb-2">(Formalised in this work)</p>
+                            <p class="text-sm">Ratio-weighted KL scales minority gradients by imbalance ratio $r$, causing:</p>
+                            <p class="font-mono text-purple-600 text-center my-2 bg-slate-50 py-1 rounded">E[g²] = O(r)</p>
+                        </div>
+                        
+                        <p>
+                            <strong class="text-slate-900">Consequence:</strong> Adaptive optimisers (Adam) suppress variance parameters systematically ($\sigma_d^2 \to 0$), collapsing minority covariance.
+                        </p>
+                        
+                        <div class="flex items-start gap-3 bg-red-50 p-3 rounded border border-red-100">
+                            <i class="fas fa-circle-exclamation text-red-500 mt-1"></i>
+                            <div>
+                                <strong class="text-red-600 text-sm">Why this matters</strong>
+                                <p class="text-sm mt-1 text-slate-600">Both SHAP and attention depend on high-rank latent structure. When $\Sigma_{min}$ collapses, explanations become stable but <span class="italic text-slate-900">meaningless</span>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: The Solution -->
+        <section class="section-card rounded-lg p-6 md:p-8">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">5. The Solution: Mahalanobis-Balanced VAE</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Concept Visual -->
+                <div class="col-span-1 bg-slate-50 rounded-lg p-4 border border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
+                     <!-- Geometric Compass SVG -->
+                    <svg viewBox="0 0 200 200" class="w-48 h-48 transition-transform duration-500 group-hover:scale-105">
+                        <!-- Grid -->
+                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+                        </pattern>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+                        
+                        <!-- Majority Manifold Ellipse -->
+                        <ellipse cx="100" cy="100" rx="70" ry="40" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.8"/>
+                        <text x="100" y="160" text-anchor="middle" fill="#64748b" font-size="8" font-family="sans-serif">Majority Manifold (Fixed Frame)</text>
+                        
+                        <!-- Center -->
+                        <circle cx="100" cy="100" r="3" fill="#334155"/>
+                        <text x="90" y="95" text-anchor="middle" fill="#334155" font-size="10">μ_maj</text>
+                        
+                        <!-- Minority Point -->
+                        <circle cx="140" cy="80" r="4" fill="#0ea5e9" class="animate-pulse"/>
+                        <text x="155" y="75" fill="#0ea5e9" font-size="10" font-weight="bold">z (fraud)</text>
+                        
+                        <!-- Mahalanobis Distance Vector -->
+                        <line x1="100" y1="100" x2="140" y2="80" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrow)"/>
+                        <text x="125" y="105" fill="#0ea5e9" font-size="9" font-weight="bold">d_M(z)</text>
+                    </svg>
+                    <p class="text-center text-xs text-slate-500 mt-2 italic">Constraining geometry directly, decoupling from gradient magnitude.</p>
+                </div>
+                
+                <!-- Equation & Logic -->
+                <div class="col-span-2 space-y-5 flex flex-col justify-center">
+                    <p class="text-slate-600 text-sm">Instead of scaling loss by $r$, constrain minority latents via Mahalanobis distance to majority manifold:</p>
+                    
+                    <div class="bg-white p-4 rounded border border-slate-200 font-mono text-center text-sky-700 text-sm md:text-base shadow-sm">
+                        d_M(z) = (z - \mu_{maj})^\top \Sigma_{maj}^{-1} (z - \mu_{maj})
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                        <div class="bg-slate-50 p-4 rounded border-l-2 border-sky-500">
+                            <h4 class="text-slate-900 font-bold text-sm mb-1">Key Design Choice 1</h4>
+                            <p class="text-slate-600 text-xs leading-relaxed">$\lambda$ is <span class="text-sky-600 font-bold">not</span> scaled by $r$. This decouples geometry from gradient magnitude.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded border-l-2 border-sky-500">
+                            <h4 class="text-slate-900 font-bold text-sm mb-1">Key Design Choice 2</h4>
+                            <p class="text-slate-600 text-xs leading-relaxed">EMA tracking of majority statistics provides a stable reference frame. Applied <span class="text-sky-600">exclusively</span> to minority samples.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Methodology -->
+        <section class="section-card rounded-lg p-6 md:p-8 border-l-4 border-indigo-500">
+            <h3 class="text-2xl font-bold text-slate-900 mb-2">6. Quantifying Faithfulness & Collapse</h3>
+            <p class="text-xs text-slate-500 mb-6 italic">* These metrics are not proposed as regulatory standards, but as diagnostics for representation health.</p>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Metric 1: Trace Ratio -->
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-2 mb-2 text-indigo-700">
+                        <i class="fas fa-ruler-combined"></i> <h4 class="font-bold text-sm">Trace Ratio</h4>
+                    </div>
+                    <div class="font-mono text-xs bg-white p-2 rounded border border-slate-200 mb-2 text-center text-slate-500">
+                        Tr(S_between) / Tr(S_within)
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        <span class="font-bold">What it measures:</span> Geometric separability. Low ratio = collapsed/overlapping classes.
+                    </p>
+                </div>
+
+                <!-- Metric 2: Effective Rank -->
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-2 mb-2 text-indigo-700">
+                        <i class="fas fa-layer-group"></i> <h4 class="font-bold text-sm">Effective Rank</h4>
+                    </div>
+                    <div class="font-mono text-xs bg-white p-2 rounded border border-slate-200 mb-2 text-center text-slate-500">
+                        exp(Entropy(singular_values))
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        <span class="font-bold">What it measures:</span> Dimensionality. Rank ~1 indicates representation has collapsed to a single line/dot (no nuance).
+                    </p>
+                </div>
+
+                <!-- Metric 3: Faithfulness Correlation -->
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-2 mb-2 text-indigo-700">
+                        <i class="fas fa-link"></i> <h4 class="font-bold text-sm">Faithfulness</h4>
+                    </div>
+                    <div class="font-mono text-xs bg-white p-2 rounded border border-slate-200 mb-2 text-center text-slate-500">
+                        Corr(Attention_Weights, Feature_Imp)
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        <span class="font-bold">What it measures:</span> Trustworthiness. Do internal "attention" weights actually match true feature importance?
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Results -->
+        <section class="section-card rounded-lg p-6 md:p-8">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">7. Results: Collapse vs. Recovery</h3>
+            
+            <div class="grid md:grid-cols-2 gap-px bg-slate-200 rounded-lg overflow-hidden border border-slate-200">
+                <!-- Left: Collapse -->
+                <div class="bg-white p-6 relative group hover:bg-slate-50 transition-colors">
+                    <div class="absolute top-4 right-4 text-red-500/10 text-6xl font-bold select-none group-hover:text-red-500/20 transition-all">!</div>
+                    <h4 class="text-red-500 font-bold mb-6 flex items-center gap-2 text-lg"><i class="fas fa-chart-line transform rotate-180"></i> Balanced VAE (Collapse)</h4>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                            <span class="text-slate-500">Trace Ratio</span>
+                            <span class="text-red-600 font-mono font-bold bg-red-50 px-2 py-0.5 rounded">0.72 → 0.03</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                            <span class="text-slate-500">Effective Rank</span>
+                            <span class="text-red-600 font-mono font-bold bg-red-50 px-2 py-0.5 rounded">4.91 → 1.35</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                            <span class="text-slate-500">Attn-Imp Corr</span>
+                            <span class="text-red-600 font-mono font-bold bg-red-50 px-2 py-0.5 rounded">≈ 0.009</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Recovery -->
+                <div class="bg-white p-6 relative group hover:bg-slate-50 transition-colors">
+                    <div class="absolute top-4 right-4 text-green-500/10 text-6xl font-bold select-none group-hover:text-green-500/20 transition-all">✓</div>
+                    <h4 class="text-green-600 font-bold mb-6 flex items-center gap-2 text-lg"><i class="fas fa-chart-line"></i> Mahalanobis-BalVAE</h4>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                            <span class="text-slate-500">Trace Ratio</span>
+                            <span class="text-green-600 font-mono font-bold bg-green-50 px-2 py-0.5 rounded">Restored: 0.68</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                            <span class="text-slate-500">Effective Rank</span>
+                            <span class="text-green-600 font-mono font-bold bg-green-50 px-2 py-0.5 rounded">Restored: 3.60</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2">
+                            <span class="text-slate-500">Attn-Imp Corr</span>
+                            <span class="text-green-600 font-mono font-bold bg-green-50 px-2 py-0.5 rounded">0.019 (Doubled)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 mt-4 text-center italic">* Values shown are representative means across 10 random seeds.</p>
+        </section>
+
+        <!-- Slide 8: Simulated Plots (Appendix C) -->
+        <section class="section-card rounded-lg p-6 md:p-8 border-t-4 border-t-sky-500">
+             <div class="flex justify-between items-end mb-4">
+                <h4 class="text-lg font-bold text-slate-900">Gradient Dynamics Analysis</h4>
+                <span class="text-xs text-slate-500 uppercase tracking-widest">Simulated from Appendix C</span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="bg-slate-50 p-3 rounded border border-red-200">
+                    <div class="text-[10px] text-red-500 mb-1 font-bold">Gradient Norm (Balanced VAE)</div>
+                    <div class="h-20"><canvas id="plot1"></canvas></div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded border border-red-200">
+                    <div class="text-[10px] text-red-500 mb-1 font-bold">Latent Variance (Balanced VAE)</div>
+                    <div class="h-20"><canvas id="plot2"></canvas></div>
+                </div>
+                 <div class="bg-slate-50 p-3 rounded border border-red-200">
+                    <div class="text-[10px] text-red-500 mb-1 font-bold">KL Divergence (Balanced VAE)</div>
+                    <div class="h-20"><canvas id="plot3"></canvas></div>
+                </div>
+                 <div class="bg-slate-50 p-3 rounded border border-green-200">
+                    <div class="text-[10px] text-green-600 mb-1 font-bold">Gradient Norm (Mahalanobis)</div>
+                    <div class="h-20"><canvas id="plot4"></canvas></div>
+                </div>
+                 <div class="bg-slate-50 p-3 rounded border border-green-200">
+                    <div class="text-[10px] text-green-600 mb-1 font-bold">Latent Variance (Mahalanobis)</div>
+                    <div class="h-20"><canvas id="plot5"></canvas></div>
+                </div>
+                 <div class="bg-slate-50 p-3 rounded border border-green-200">
+                    <div class="text-[10px] text-green-600 mb-1 font-bold">KL Divergence (Mahalanobis)</div>
+                    <div class="h-20"><canvas id="plot6"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Cross-Dataset Robustness -->
+        <section class="section-card rounded-lg p-6 md:p-8">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">8. Cross-Dataset Robustness</h3>
+            <div class="grid md:grid-cols-3 gap-6 items-center">
+                <div class="col-span-1 flex flex-col items-center justify-center p-6 bg-slate-50 rounded border border-slate-200 h-full">
+                    <i class="fas fa-database text-5xl text-slate-400 mb-4"></i>
+                    <h4 class="text-slate-800 font-bold text-center text-lg">Two Datasets,<br>One Story</h4>
+                    <p class="text-xs text-slate-500 text-center mt-2">European Credit & IEEE-CIS</p>
+                </div>
+                <div class="col-span-2 space-y-4">
+                    <div class="bg-white p-4 rounded border-l-4 border-sky-400 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <h5 class="text-sky-700 text-sm font-bold">European Credit Card (585:1)</h5>
+                        </div>
+                        <p class="text-slate-600 text-sm mt-1">Same collapse/recovery pattern observed as main results.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded border-l-4 border-purple-400 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <h5 class="text-purple-700 text-sm font-bold">IEEE-CIS Fraud Detection (172:1)</h5>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <p class="text-xs text-slate-500">Balanced VAE Rank</p>
+                                <p class="text-slate-900 font-mono text-sm">3.98 → 1.00</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Mahalanobis Rank</p>
+                                <p class="text-slate-900 font-mono text-sm">Recovers to 2.49</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Implications -->
+        <section class="section-card rounded-lg p-6 md:p-8 bg-gradient-to-br from-slate-100 to-slate-200">
+            <h3 class="text-2xl font-bold text-slate-900 mb-8 text-center">9. Implications & Takeaways</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Researchers -->
+                <div class="bg-white p-6 rounded-lg border border-slate-200 hover:border-sky-500 transition duration-300 shadow-lg group">
+                    <div class="text-sky-500 text-3xl mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-microscope"></i></div>
+                    <h4 class="text-slate-900 font-bold mb-3">For Researchers</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">Explainability under imbalance is a <span class="text-slate-900 font-medium">representational problem</span>. Evaluate latent geometry, not just detection metrics.</p>
+                </div>
+
+                <!-- Practitioners -->
+                <div class="bg-white p-6 rounded-lg border border-slate-200 hover:border-green-500 transition duration-300 shadow-lg group">
+                    <div class="text-green-500 text-3xl mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-code-branch"></i></div>
+                    <h4 class="text-slate-900 font-bold mb-3">For Practitioners</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">Use geometry-aware training to satisfy both performance and regulatory explanation requirements. Avoid ratio-weighted KL in isolation.</p>
+                </div>
+
+                <!-- Regulators -->
+                <div class="bg-white p-6 rounded-lg border border-slate-200 hover:border-yellow-500 transition duration-300 shadow-lg group">
+                    <div class="text-yellow-500 text-3xl mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-gavel"></i></div>
+                    <h4 class="text-slate-900 font-bold mb-3">For Regulators</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">Motivates consideration of representation-level diagnostics alongside output-level metrics.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 text-center py-8">
+        <p class="text-slate-500 text-sm">Conference Research Board • 2026 • ID: 216011757</p>
+    </footer>
+
+    <script>
+        // Data simulation for charts
+        function generateData(type, points = 40) {
+            const data = [];
+            let val = 10;
+            for (let i = 0; i < points; i++) {
+                if (type === 'exploding') {
+                    // Exponential growth with noise
+                    val = val * (1 + (Math.random() * 0.1)); 
+                    // Add jagged spikes
+                    let noise = (Math.random() - 0.3) * val * 0.8;
+                    data.push(val + noise);
+                } else if (type === 'stable') {
+                    // Gentle oscillation around a mean
+                    val = 10 + Math.sin(i * 0.3) * 2 + Math.random() * 1.5;
+                    data.push(val);
+                } else if (type === 'decay') {
+                    // Fast decay to zero
+                    val = val * 0.85;
+                    data.push(val + Math.random());
+                } else if (type === 'kl_explode') {
+                    data.push(Math.pow(i, 2) * 0.1 + Math.random()*5);
+                }
+            }
+            return data;
+        }
+
+        const labels = Array.from({length: 40}, (_, i) => i);
+
+        // Main Header Chart: Gradient Norm
+        new Chart(document.getElementById('gradientChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Balanced VAE (Exploding Variance)',
+                        data: generateData('exploding', 40),
+                        borderColor: '#ef4444', // Red 500
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        fill: true
+                    },
+                    {
+                        label: 'Mahalanobis (Bounded)',
+                        data: generateData('stable', 40),
+                        borderColor: '#22c55e', // Green 500
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#334155', font: {family: 'Roboto'} } } }, // Dark text
+                scales: {
+                    x: { display: false },
+                    y: { 
+                        display: true, 
+                        grid: { color: '#e2e8f0' }, // Light grey grid
+                        ticks: { color: '#64748b' } // Slate 500 ticks
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+
+        // Small Sparklines Configuration
+        const smallChartConfig = (ctx, data, color, type = 'line') => {
+            return new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        borderColor: color,
+                        backgroundColor: color + '20', // slight transparency
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        tension: 0.2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: {enabled: false} },
+                    scales: { x: { display: false }, y: { display: false, min: 0 } },
+                    animation: { duration: 1500 }
+                }
+            });
+        };
+
+        // Top Row: Unstable (Simulating Appendix C figures)
+        smallChartConfig(document.getElementById('plot1'), generateData('exploding'), '#ef4444');
+        smallChartConfig(document.getElementById('plot2'), generateData('decay'), '#ef4444'); 
+        smallChartConfig(document.getElementById('plot3'), generateData('kl_explode'), '#ef4444');
+
+        // Bottom Row: Stable
+        smallChartConfig(document.getElementById('plot4'), generateData('stable'), '#22c55e');
+        smallChartConfig(document.getElementById('plot5'), generateData('stable'), '#22c55e');
+        smallChartConfig(document.getElementById('plot6'), generateData('stable'), '#22c55e');
+
+    </script>
+</body>
+</html>
